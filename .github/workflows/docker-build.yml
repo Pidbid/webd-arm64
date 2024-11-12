@@ -1,0 +1,33 @@
+name: 打包 webd-arm64 镜像
+
+on: push
+
+jobs:
+  builder:
+    name: 打包工作
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: 读取仓库内容
+      uses: actions/checkout@v4
+    
+    - name: 获取docker 信息
+      run: docker --version
+    - name: 初始 QEMU 支持
+      uses: docker/setup-qemu-action@v3
+
+    - name: 初始 buildx 支持
+      uses: docker/setup-buildx-action@v3
+
+    - name: 登录docker hub
+      uses: docker/login-action@v3
+      with:
+        username: ${{secrets.DOCKERHUB_USERNAME}}
+        password: ${{secrets.DOCKERHUB_SECRET}}
+
+    - name: 构建镜像并推送
+      uses: docker/build-push-action@v6
+      with:
+        platforms: linux/arm64
+        push: true
+        tags: wicos/webd-arm64:latest
